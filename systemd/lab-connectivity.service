@@ -1,0 +1,11 @@
+[Unit]
+Description=Check connectivity to the lab server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=julia
+WorkingDirectory=/home/julia/projects/linux-network-lab
+ExecStart=/home/julia/projects/linux-network-lab/scripts/run-connectivity-check.sh
+TimeoutStartSec=30
