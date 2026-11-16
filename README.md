@@ -204,12 +204,3 @@ Issues investigated during the project included:
 
 Diagnostics used interface state, service status, DHCP logs, routing tables, exit codes, and nftables counters.
 
-## Limitations
-
-- This is an educational lab.
-- Routing and NAT are configured for IPv4.
-- nftables rules filter forwarded traffic; they do not provide a complete firewall policy for services running on the server.
-- The automated script checks server connectivity, name resolution, and the default route. It does not automatically verify internet access.
-- Log rotation is not configured.
-- Backups are stored locally and do not protect against loss of the VM disk.
-- Configuration restoration has not been validated.
