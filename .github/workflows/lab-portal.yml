@@ -1,0 +1,36 @@
+name: Lab Portal checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  portal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nginx shellcheck
+      - name: Validate deployment script
+        run: |
+          bash -n scripts/deploy-site.sh
+          shellcheck scripts/deploy-site.sh
+          bash scripts/deploy-site.sh --help
+      - name: Test site with Nginx
+        run: |
+          sudo install -d -m 755 /var/www/lab-portal
+          sudo install -m 644 site/index.html site/styles.css /var/www/lab-portal/
+          sudo install -m 644 configs/nginx/lab-portal.conf /etc/nginx/sites-available/lab-portal.conf
+          sudo ln -s /etc/nginx/sites-available/lab-portal.conf /etc/nginx/sites-enabled/lab-portal.conf
+          sudo nginx -t
+          sudo systemctl restart nginx
+          curl -fsS -H 'Host: portal.lab.test' http://127.0.0.1/ | grep -q 'Small network.'
+          curl -fsS -H 'Host: portal.lab.test' http://127.0.0.1/styles.css -o /dev/null
+          curl -fsS -H 'Host: portal.lab.test' http://127.0.0.1/healthz -o /dev/null
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: portal.lab.test' http://127.0.0.1/missing-page)" = 404
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: portal.lab.test' http://127.0.0.1/.env)" = 403
+          sudo mv /var/www/lab-portal/index.html /var/www/lab-portal/index.html.test-backup
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: portal.lab.test' http://127.0.0.1/healthz)" = 503
