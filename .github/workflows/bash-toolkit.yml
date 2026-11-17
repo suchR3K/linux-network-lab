@@ -1,0 +1,33 @@
+name: Bash toolkit checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+      - name: Check syntax and lint new scripts
+        run: |
+          files=(
+            scripts/check-directory-size.sh
+            scripts/check-log.sh
+            scripts/check-http.sh
+            tests/test-bash-toolkit.sh
+          )
+          for file in "${files[@]}"; do
+            bash -n "$file"
+          done
+          shellcheck "${files[@]}"
+      - name: Run controlled tests
+        run: bash tests/test-bash-toolkit.sh
