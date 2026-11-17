@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A practical Linux networking lab: DHCP, DNS, routing and repeatable static site deployments.">
+  <title>Lab Portal | Linux Network Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top"><a class="brand" href="#">LN<span>/</span>LAB</a><nav aria-label="Main"><a href="#network">Network</a><a href="#services">Services</a><a href="#deploy">Deployment</a></nav></header>
+  <main>
+    <section class="hero"><p class="eyebrow">VIRTUALBOX / UBUNTU / BASH</p><h1>Small network.<br><span>Real infrastructure.</span></h1><p class="intro">Two Linux machines. One connected lab. A practical environment for learning how addressing, name resolution, routing and deployment work together.</p><a class="button" href="#network">Explore the lab <span aria-hidden="true">↘</span></a><p class="notice">Architecture reference · Static documentation, not live monitoring</p></section>
+    <section id="network"><div class="heading"><p class="eyebrow">01 / TOPOLOGY</p><h2>Follow the packet.</h2></div><div class="topology"><article><span class="tag">CLIENT</span><h3>lab-client</h3><code>192.168.50.10</code><p>DHCP reservation<br>DNS and HTTP client</p></article><span class="arrow" aria-hidden="true">→</span><article class="server"><span class="tag">GATEWAY + WEB SERVER</span><h3>lab-server</h3><code>192.168.50.1</code><p>enp0s8 · Lab network<br>enp0s3 · VirtualBox NAT</p></article><span class="arrow" aria-hidden="true">→</span><article><span class="tag">UPSTREAM</span><h3>Internet</h3><code>IPv4 masquerade</code><p>Forwarded through the server<br>Outbound connectivity</p></article></div></section>
+    <section id="services"><div class="heading"><p class="eyebrow">02 / BUILDING BLOCKS</p><h2>Each service has a job.</h2></div><div class="grid"><article><span class="number">01</span><h3>Addressing</h3><p>dnsmasq assigns client addresses. The client reservation keeps its lab address predictable.</p><code>DHCP · 192.168.50.0/24</code></article><article><span class="number">02</span><h3>Name resolution</h3><p>Local names map to the lab server. External queries are forwarded to an upstream resolver.</p><code>portal.lab.test → .50.1</code></article><article><span class="number">03</span><h3>Routing</h3><p>IPv4 forwarding and nftables let the client reach external networks through the server.</p><code>Forwarding + NAT</code></article><article><span class="number">04</span><h3>Static hosting</h3><p>Nginx serves this portal from a dedicated directory. SSH and rsync deliver updated files.</p><code>/var/www/lab-portal</code></article></div></section>
+    <section id="deploy" class="deploy"><div><p class="eyebrow">03 / DELIVERY</p><h2>Edit. Preview.<br>Deploy. Verify.</h2><p>Version the site in Git, inspect a dry run, transfer the files and check the HTTP response.</p></div><div class="terminal"><p><span>$</span> bash scripts/deploy-site.sh --dry-run</p><p><span>$</span> bash scripts/deploy-site.sh</p><p><span>$</span> curl -fsS http://portal.lab.test/healthz</p><small>Example commands — run after server setup.</small></div></section>
+  </main><footer><span>Linux Network Lab / Lab Portal</span><span>Built to understand the system.</span></footer>
+</body>
+</html>
